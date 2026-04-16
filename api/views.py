@@ -92,27 +92,79 @@ def audit_fabrication():
     pdf_file.save(temp_path)
     
     try:
-        # Extraction texte du PDF protocole
+        # 1. Extraction texte du PDF protocole
         from langchain_community.document_loaders import PyPDFLoader
         loader = PyPDFLoader(temp_path)
-        protocol_text = "\n".join([doc.page_content for doc in loader.load()])
+        protocol_text = "\n".join([doc.page_content for doc in loader.load()]).lower()
         
-        # Recherche RAG filtrée par norme
+        # 2. Recherche RAG filtrée par norme
         context_docs = rag_manager.search(
-            query=protocol_text[:500],
-            k=4,
+            query="hygiène EPI température documentation contrôle qualité ISO 22716",
+            k=6,
             norme_filter=norme_ref
         )
         context_text = "\n\n".join([d.page_content for d in context_docs])
         
-        # Mock de résultat pour la démo (remplace par ton vrai agent)
+        # 3. Détection intelligente des violations (règles métier)
+        violations = []
+        score_risque = 0
+        
+        # Vérification 1: EPI & Hygiène (ISO 22716 Section 7.2)
+        if not any(mot in protocol_text for mot in ['epi', 'gants', 'lunettes', 'blouse', 'hygiène', 'désinfection']):
+            violations.append({
+                "etape": "Hygiène & EPI",
+                "ecart": "Aucune mention des Équipements de Protection Individuelle (gants, lunettes, blouse) ni procédure d'hygiène",
+                "reference_iso": "ISO 22716:2007 - Section 7.2 (Personnel & Hygiène)"
+            })
+            score_risque += 3
+        
+        # Vérification 2: Température critique (ISO 22716 Section 8.2)
+        if 'température' not in protocol_text and '°c' not in protocol_text and 'degré' not in protocol_text:
+            violations.append({
+                "etape": "Paramètres de Production",
+                "ecart": "Température de chauffe non spécifiée (risque de dégradation >75°C)",
+                "reference_iso": "ISO 22716:2007 - Section 8.2 (Contrôle des opérations)"
+            })
+            score_risque += 2
+        
+        # Vérification 3: Documentation & Traçabilité (ISO 22716 Section 12)
+        if not any(mot in protocol_text for mot in ['fiche de lot', 'traçabilité', 'enregistrement', 'documentation', 'batch']):
+            violations.append({
+                "etape": "Documentation",
+                "ecart": "Absence de procédure de traçabilité et fiche de lot",
+                "reference_iso": "ISO 22716:2007 - Section 12 (Documentation)"
+            })
+            score_risque += 2
+        
+        # Vérification 4: Contrôle microbiologique (ISO 22716 Section 9.3)
+        if 'challenge test' in protocol_text or 'microbiolog' in protocol_text:
+            if not any(mot in protocol_text for mot in ['critère', 'acceptation', 'limite', 'norme']):
+                violations.append({
+                    "etape": "Contrôle Qualité Microbiologique",
+                    "ecart": "Challenge test mentionné sans critères d'acceptation définis",
+                    "reference_iso": "ISO 22716:2007 - Section 9.3 (Contrôles microbiologiques)"
+                })
+                score_risque += 1
+        
+        # Actions correctives dynamiques
+        actions_correctives = []
+        if any(v['etape'] == 'Hygiène & EPI' for v in violations):
+            actions_correctives.append("Ajouter une section 'Hygiène & EPI' avec procédure de désinfection des cuves et port obligatoire de gants/lunettes/blouse")
+        if any(v['etape'] == 'Paramètres de Production' for v in violations):
+            actions_correctives.append("Spécifier température max 75°C et durée max de chauffe dans le procédé")
+        if any(v['etape'] == 'Documentation' for v in violations):
+            actions_correctives.append("Créer un template de fiche de lot avec traçabilité complète des matières premières")
+        if any(v['etape'] == 'Contrôle Qualité Microbiologique' for v in violations):
+            actions_correctives.append("Définir critères d'acceptation pour le challenge test (log reduction ≥ 3)")
+        
+        # Détermination du statut
+        conformite_globale = "CONFORME" if score_risque < 3 else "NON CONFORME"
+        
         result = {
-            "conformite_globale": "NON CONFORME" if "85" in protocol_text else "CONFORME",
-            "score_risque": 7 if "85" in protocol_text else 2,
-            "violations": [
-                {"etape": "Chauffage", "ecart": "Température > 75°C", "reference_iso": norme_ref}
-            ] if "85" in protocol_text else [],
-            "actions_correctives": ["Réduire température à 70°C max"] if "85" in protocol_text else []
+            "conformite_globale": conformite_globale,
+            "score_risque": min(score_risque, 10),
+            "violations": violations,
+            "actions_correctives": actions_correctives
         }
         
         return jsonify({"compliance_result": result}), 200
@@ -122,11 +174,29 @@ def audit_fabrication():
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
-
 # Route: Health check
 @flask_app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({"status": "ok", "message": "API running"}), 200
+
+
+# Pour la génération PDF backend
+@flask_app.route('/api/generate-report-pdf', methods=['POST'])
+def generate_report_pdf():
+    from agents.report_agent import ReportAgent
+    from flask import send_file
+    from datetime import datetime
+    
+    data = request.json
+    audit_result = data.get('compliance_result', {})
+    protocol_text = data.get('protocol_text', '')
+    norme_ref = data.get('norme_reference', 'ISO 22716:2007')
+    
+    report_agent = ReportAgent()
+    pdf_buffer = report_agent.generate_pdf(audit_result, protocol_text, norme_ref)
+    
+    filename = f"Rapport_Audit_{norme_ref.replace(' ','_')}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
 # ==================== LANCEMENT ====================
 if __name__ == "__main__":
