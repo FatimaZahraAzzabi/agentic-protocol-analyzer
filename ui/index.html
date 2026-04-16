@@ -115,6 +115,10 @@
                                 </select>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Description de la Norme</label>
+                                <textarea class="form-control" id="normeDesc" rows="3" placeholder="Ex: Bonnes pratiques de fabrication pour cosmétiques"></textarea>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Fichier PDF *</label>
                                 <input type="file" class="form-control" id="pdfFile" accept=".pdf" required>
                                 <div class="form-text">Format PDF uniquement. Taille max: 20MB.</div>
@@ -221,6 +225,14 @@
                         <div id="actionsSection">
                             <h6><i class="bi bi-lightbulb text-warning"></i> Actions Correctives Recommandées</h6>
                             <ul id="actionsList" class="list-group"></ul>
+                        </div>
+                        <div id="bioAlternativesSection" class="mb-4">
+                            <h6><i class="bi bi-leaf text-success"></i> Alternatives Bio / Naturelles</h6>
+                            <ul id="bioAlternativesList" class="list-group"></ul>
+                        </div>
+                        <div id="complementaryStandardsSection" class="mb-4">
+                            <h6><i class="bi bi-book-half text-primary"></i> Normes Complémentaires à Vérifier</h6>
+                            <ul id="complementaryStandardsList" class="list-group"></ul>
                         </div>
                         <div class="mt-4 d-grid gap-2">
                             <button class="btn btn-primary" id="btnDownloadPDF"><i class="bi bi-download"></i> Télécharger le Rapport PDF</button>
@@ -340,7 +352,7 @@
                 document.getElementById('step4')?.classList.add('completed');
                 document.getElementById('resultSection')?.classList.add('show');
                 
-                const score = result.score_risque ?? 0;
+                const score = Math.max(0, Math.min(10, Number(result.score_risque) || 0));
                 const scoreEl = document.getElementById('riskScore');
                 if (scoreEl) { scoreEl.textContent = score; scoreEl.className = 'display-4 fw-bold ' + (score<3?'text-success':score<7?'text-warning':'text-danger'); }
                 
@@ -352,7 +364,16 @@
                 
                 const aList = document.getElementById('actionsList');
                 if (aList) aList.innerHTML = result.actions_correctives?.length ? result.actions_correctives.map(a=>`<li class="list-group-item"><i class="bi bi-check2-circle text-success me-2"></i>${a}</li>`).join('') : '<li class="list-group-item text-muted">Aucune action corrective requise</li>';
-                
+
+                const bioList = document.getElementById('bioAlternativesList');
+                if (bioList) {
+                    bioList.innerHTML = result.bio_alternatives?.length ? result.bio_alternatives.map(item => `<li class="list-group-item text-success">${item}</li>`).join('') : '<li class="list-group-item text-muted">Aucune alternative bio proposée</li>';
+                }
+
+                const complementaryList = document.getElementById('complementaryStandardsList');
+                if (complementaryList) {
+                    complementaryList.innerHTML = result.normes_complementaires?.length ? result.normes_complementaires.map(item => `<li class="list-group-item"><strong>${item.nom}</strong> (${item.type})<br/><small class="text-muted">${item.commentaire}</small></li>`).join('') : '<li class="list-group-item text-muted">Aucune norme complémentaire identifiée</li>';
+                }
             } catch (error) {
                 console.error('Erreur audit:', error);
                 alert('❌ Erreur lors de l\'analyse: ' + error.message);

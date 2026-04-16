@@ -10,9 +10,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
 
-from langchain_community.vectorstores import FAISS
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_openai import OpenAIEmbeddings
+try:
+    from langchain_community.vectorstores import FAISS
+    from langchain_community.document_loaders import PyPDFLoader
+    from langchain_openai import OpenAIEmbeddings
+except ImportError:
+    FAISS = None
+    PyPDFLoader = None
+    OpenAIEmbeddings = None
 from langchain_core.documents import Document
 
 class DynamicRAGManager:
@@ -25,6 +30,11 @@ class DynamicRAGManager:
         Args:
             db_path: Chemin vers le dossier de sauvegarde de la base FAISS
         """
+        if FAISS is None or PyPDFLoader is None or OpenAIEmbeddings is None:
+            raise ImportError(
+                "Il manque les dépendances LangChain. Installez langchain_community et langchain_openai."
+            )
+
         self.db_path = Path(db_path)
         self.embeddings = OpenAIEmbeddings()
         self.db = None
@@ -39,16 +49,16 @@ class DynamicRAGManager:
                     self.embeddings, 
                     allow_dangerous_deserialization=True
                 )
-                print(f"✅ Base RAG chargée depuis {self.db_path}")
+                print(f"Base RAG chargée depuis {self.db_path}")
             else:
                 # Crée une base vide avec un document placeholder
                 placeholder = Document(page_content="", metadata={"init": True})
                 self.db = FAISS.from_documents([placeholder], self.embeddings)
                 self.db_path.mkdir(parents=True, exist_ok=True)
                 self.db.save_local(str(self.db_path))
-                print(f"🆕 Nouvelle base RAG créée: {self.db_path}")
+                print(f"Nouvelle base RAG créée: {self.db_path}")
         except Exception as e:
-            print(f"⚠️ Erreur chargement base: {e}")
+            print(f"Erreur chargement base: {e}")
             # Fallback: base vide
             placeholder = Document(page_content="", metadata={"init": True})
             self.db = FAISS.from_documents([placeholder], self.embeddings)
@@ -59,6 +69,7 @@ class DynamicRAGManager:
         pdf_file_path: str,
         description: str = "",
         category: str = "interne",
+        sector: str = "autre",
         user_id: str = "admin",
         project_id: str = "conformite_cosmetique"
     ) -> Dict:
@@ -85,6 +96,7 @@ class DynamicRAGManager:
             "user_id": user_id,
             "project_id": project_id,
             "norme_name": norme_name,
+            "sector": sector,
             "description": description,
             "category": category,
             "filename": os.path.basename(pdf_file_path),
@@ -175,6 +187,7 @@ class DynamicRAGManager:
                     "name": name,
                     "description": meta.get("description", ""),
                     "category": meta.get("category", "interne"),
+                    "sector": meta.get("sector", "autre"),
                     "filename": meta.get("filename", ""),
                     "upload_date": meta.get("upload_date", ""),
                     "user_id": meta.get("user_id", "unknown"),

@@ -17,13 +17,24 @@ from flask import Flask, request, jsonify, send_from_directory
 # 4. Imports de tes agents
 from agents.rag_manager import DynamicRAGManager
 
+try:
+    from langchain_community.document_loaders import PyPDFLoader
+except ImportError:
+    PyPDFLoader = None
+
 # 5. ⚠️ CRÉER L'INSTANCE FLASK ICI (avant les @app.route !)
 flask_app = Flask(__name__, 
                   static_folder='../ui/static', 
                   template_folder='../ui')
 
 # 6. Initialiser le RAG Manager
-rag_manager = DynamicRAGManager(db_path="data/vector_db")
+try:
+    rag_manager = DynamicRAGManager(db_path="data/vector_db")
+except ImportError as e:
+    rag_manager = None
+    rag_error = str(e)
+else:
+    rag_error = None
 
 # ==================== ROUTES ====================
 
@@ -35,6 +46,9 @@ def index():
 # Route: Upload norme (Admin)
 @flask_app.route('/api/upload-norme', methods=['POST'])
 def upload_norme():
+    if rag_manager is None:
+        return jsonify({"error": f"Impossible de charger le RAG Manager: {rag_error}"}), 500
+
     if 'pdf_file' not in request.files:
         return jsonify({"error": "Aucun fichier PDF"}), 400
     
@@ -54,7 +68,8 @@ def upload_norme():
             norme_name=norme_name,
             pdf_file_path=filepath,
             description=request.form.get('description', ''),
-            category=request.form.get('category', 'interne')
+            category=request.form.get('category', 'interne'),
+            sector=request.form.get('sector', 'autre')
         )
         return jsonify(result), 200
     except Exception as e:
@@ -66,6 +81,9 @@ def upload_norme():
 # Route: Liste des normes
 @flask_app.route('/api/list-normes', methods=['GET'])
 def list_normes():
+    if rag_manager is None:
+        return jsonify({"error": f"Impossible de charger le RAG Manager: {rag_error}"}), 500
+
     try:
         normes = rag_manager.get_indexed_normes()
         stats = rag_manager.get_stats()
@@ -75,52 +93,62 @@ def list_normes():
 
 # Route: Audit fabrication
 @flask_app.route('/api/audit-fabrication', methods=['POST'])
-@flask_app.route('/api/audit-fabrication', methods=['POST'])
 def audit_fabrication():
-    if 'protocol_pdf' not in request.files:
-        return jsonify({"error": "Aucun PDF de protocole"}), 400
-    
-    pdf_file = request.files['protocol_pdf']
-    norme_ref = request.form.get('norme_reference', 'ISO 22716:2007')
-    # 🔑 NOUVEAU: Récupérer le secteur choisi par l'utilisateur
-    sector = request.form.get('sector', 'cosmetique') 
-    
-    if pdf_file.filename == '' or not pdf_file.filename.endswith('.pdf'):
-        return jsonify({"error": "Fichier PDF invalide"}), 400
-    
-    import uuid
-    temp_path = f"data/temp_protocol_{uuid.uuid4().hex}.pdf"
-    os.makedirs("data", exist_ok=True)
-    pdf_file.save(temp_path)
-    
+    norme_ref = 'ISO 22716:2007'
+    sector = 'cosmetique'
+    protocol_text = None
+
+    if 'protocol_pdf' in request.files:
+        pdf_file = request.files['protocol_pdf']
+        if pdf_file.filename == '':
+            return jsonify({"error": "Fichier PDF vide"}), 400
+
+        norme_ref = request.form.get('norme_reference', norme_ref)
+        sector = request.form.get('sector', sector)
+
+        upload_folder = "data/normes_uploaded"
+        os.makedirs(upload_folder, exist_ok=True)
+        temp_path = os.path.join(upload_folder, secure_filename(pdf_file.filename))
+        pdf_file.save(temp_path)
+
+        if PyPDFLoader is None:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return jsonify({"error": "Le module langchain_community n'est pas installé. Installez-le pour pouvoir extraire le contenu du PDF."}), 500
+
+        try:
+            loader = PyPDFLoader(temp_path)
+            protocol_text = "\n".join([doc.page_content for doc in loader.load()])
+        except Exception as e:
+            return jsonify({"error": f"Impossible d'extraire le PDF: {str(e)}"}), 500
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    else:
+        data = request.get_json(silent=True) or {}
+        protocol_text = data.get('protocol')
+        norme_ref = data.get('norme_reference', norme_ref)
+        sector = data.get('sector', sector)
+
+        if not protocol_text:
+            return jsonify({"error": "Aucun protocole fourni dans le corps JSON."}), 400
+
     try:
-        # 1. Extraction du texte (identique à avant)
-        from langchain_community.document_loaders import PyPDFLoader
-        loader = PyPDFLoader(temp_path)
-        protocol_text = "\n".join([doc.page_content for doc in loader.load()])
-        
-        # 2. APPEL À L'AGENT (C'est lui qui fait tout le travail maintenant)
         from agents.iso_compliance_agent import ISOComplianceAgent
         agent = ISOComplianceAgent()
-        
-        # L'agent va :
-        # 1. Chercher dans RAG
-        # 2. Comparer via LLM
-        # 3. Générer les recommandations de normes complémentaires
-        result = agent.verify_manufacturing(
-            protocol=protocol_text, 
-            norme_ref=norme_ref, 
-            sector=sector
-        )
-        
-        return jsonify({"compliance_result": result}), 200
-        
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-            
+        return jsonify({"error": f"Impossible de charger l'agent de conformité: {str(e)}"}), 500
+    
+    result = agent.verify_manufacturing(
+        protocol=protocol_text,
+        norme_ref=norme_ref,
+        sector=sector,
+        product_type="produit"
+    )
+    
+    return jsonify({"compliance_result": result}), 200
+
 # Route: Health check
 @flask_app.route('/api/health', methods=['GET'])
 def health():

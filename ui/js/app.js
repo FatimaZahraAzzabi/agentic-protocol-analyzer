@@ -52,9 +52,14 @@ async function analyzeProtocol(protocol) {
             body: JSON.stringify({ protocol: protocol })
         });
         
-        if (!response.ok) throw new Error('Erreur serveur');
+        let data;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            const message = errorData?.error || `Erreur serveur ${response.status}`;
+            throw new Error(message);
+        }
         
-        const data = await response.json();
+        data = await response.json();
         
         // Étape 2: Analyse terminée
         updateStep('step-retrieve', 'completed');
