@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme Nationale de Conformité Cosmétique | Ministère de l'Industrie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #d97706;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+        }
+
+        /* Header Institutionnel */
+        .top-bar {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: white;
+            padding: 15px 0;
+            border-bottom: 4px solid var(--accent-gold);
+        }
+        
+        .institutional-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-emblem {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            border: 3px solid var(--accent-gold);
+        }
+        
+        .institution-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+        
+        .institution-title p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-link {
+            color: var(--primary-blue);
+            font-weight: 500;
+            padding: 15px 20px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-gold);
+            border-bottom-color: var(--accent-gold);
+            background: var(--light-bg);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(30, 58, 138, 0.9), rgba(30, 58, 138, 0.8)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f0f9ff" width="1200" height="600"/></svg>');
+            background-size: cover;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .hero-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero-section .lead {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 50px 0;
+        }
+        
+        .section-title {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent-gold);
+            display: inline-block;
+        }
+
+        /* Cards Institutionnelles */
+        .info-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            background: white;
+            height: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .info-card i {
+            font-size: 2.5rem;
+            color: var(--secondary-blue);
+            margin-bottom: 15px;
+        }
+        
+        .info-card h5 {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Formulaire d'Audit */
+        .audit-form-container {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+        
+        .btn-institutional {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-institutional:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+
+        /* Résultats */
+        .result-box {
+            background: white;
+            border-left: 5px solid var(--secondary-blue);
+            padding: 25px;
+            margin-top: 30px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer Institutionnel */
+        .institutional-footer {
+            background: var(--primary-blue);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Workflow Steps */
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            opacity: 0.6;
+        }
+        
+        .workflow-step.active {
+            background: #dbeafe;
+            opacity: 1;
+            border-left: 4px solid var(--secondary-blue);
+        }
+        
+        .workflow-step.completed {
+            background: #d1fae5;
+            opacity: 1;
+            border-left: 4px solid #10b981;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .institutional-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-section {
+                flex-direction: column;
+            }
+            
+            .hero-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Institutionnel -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="institutional-header">
+                <div class="logo-section">
+                    <div class="logo-emblem">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="institution-title">
+                        <h1>Plateforme Nationale de Conformité Cosmétique</h1>
+                        <p>Ministère de l'Industrie et du Commerce | Direction de la Qualité et de la Conformité</p>
+                    </div>
+                </div>
+                <div class="d-none d-md-block">
+                    <span class="badge bg-warning text-dark fs-6">ISO 22716 | BPF Cosmétiques</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="#" class="nav-link active"><i class="bi bi-house-door"></i> Accueil</a></li>
+                <li class="nav-item"><a href="#audit" class="nav-link"><i class="bi bi-clipboard-check"></i> Audit de Protocole</a></li>
+                <li class="nav-item"><a href="#normes" class="nav-link"><i class="bi bi-book"></i> Normes & Réglementations</a></li>
+                <li class="nav-item"><a href="#statistiques" class="nav-link"><i class="bi bi-graph-up"></i> Statistiques</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link"><i class="bi bi-envelope"></i> Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h2>Système Intelligent d'Audit de Conformité</h2>
+            <p class="lead">
+                Plateforme d'intelligence artificielle agentique pour la vérification automatique 
+                des protocoles de fabrication cosmétique selon les normes ISO 22716 et la réglementation marocaine
+            </p>
+            <a href="#audit" class="btn btn-warning btn-lg fw-bold">
+                <i class="bi bi-play-circle"></i> Lancer un Audit
+            </a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="content-section">
+        <div class="container">
+            <h3 class="section-title">Nos Services</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="info-card text-center">
+                        <i class="bi bi-cpu"></i>
+                        <h5>Audit Automatisé par IA</h5>
+                        <p>Analyse intelligente de vos protocoles de fabrication avec détection automatique des non-conformités selon l'ISO 22716.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card text-center">
+                        <i class="bi bi-database"></i>
+                        <h5>Base de Connaissances Normatives</h5>
+                        <p>Accès aux normes ISO 22716, directives FDA, circulaire 104-DMP et référentiels IMANOR.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card text-center">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        <h5>Rapports de Conformité</h5>
+                        <p>Génération automatique de rapports détaillés avec actions correctives et recommandations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Administration des Normes -->
+<section id="admin-normes" class="content-section" style="background: #f1f5f9;">
+    <div class="container">
+        <h3 class="section-title"><i class="bi bi-shield-lock"></i> Administration des Normes</h3>
+        <p class="text-muted mb-4">Espace réservé aux administrateurs pour gérer la base de connaissances normative.</p>
+        
+        <div class="row g-4">
+            <!-- Formulaire d'upload -->
+            <div class="col-lg-6">
+                <div class="audit-form-container">
+                    <h5 class="mb-4"><i class="bi bi-cloud-upload"></i> Ajouter une Nouvelle Norme</h5>
+                    <form id="uploadNormeForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de la Norme *</label>
+                            <input type="text" class="form-control" id="normeName" 
+                                   placeholder="Ex: ISO 22716:2007, FDA GMP, Circulaire 104-DMP..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (optionnelle)</label>
+                            <textarea class="form-control" id="normeDesc" rows="2" 
+                                      placeholder="Brève description de cette norme..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fichier PDF *</label>
+                            <input type="file" class="form-control" id="pdfFile" accept=".pdf" required>
+                            <div class="form-text">Format PDF uniquement. Taille max: 20MB.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Catégorie</label>
+                            <select class="form-select" id="normeCategory">
+                                <option value="international">Norme Internationale (ISO)</option>
+                                <option value="national" selected>Réglementation Nationale (Maroc)</option>
+                                <option value="guide">Guide Technique (FDA, UE...)</option>
+                                <option value="interne">Documentation Interne</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-institutional w-100">
+                            <i class="bi bi-upload"></i> Indexer la Norme dans la Base RAG
+                        </button>
+                    </form>
+                    
+                    <!-- Message de statut -->
+                    <div id="uploadStatus" class="mt-3" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <!-- Liste des normes indexées -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Normes Indexées</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="refreshNormesList()">
+                            <i class="bi bi-arrow-clockwise"></i> Actualiser
+                        </button>
+                    </div>
+                    <div class="card-body" id="normesListContainer" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Rempli dynamiquement par JS -->
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-hourglass-split"></i><br>
+                            Chargement des normes...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats rapides -->
+                <div class="row g-2 mt-3">
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: white; border: 1px solid var(--border-color);">
+                            <div class="fs-4 fw-bold text-primary" id="totalNormes">0</div>
+                            <small class="text-muted">Normes actives</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: white; border: 1px solid var(--border-color);">
+                            <div class="fs-4 fw-bold text-success" id="totalChunks">0</div>
+                            <small class="text-muted">Chunks vectorisés</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Audit Section -->
+   <!-- Audit Section -->
+<section id="audit" class="content-section" style="background: white;">
+    <div class="container">
+        <h3 class="section-title">Audit de Protocole de Fabrication</h3>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="audit-form-container">
+                    <h5 class="mb-4"><i class="bi bi-clipboard-data"></i> Soumettre un Protocole</h5>
+                    <form id="auditForm" enctype="multipart/form-data">
+                        
+                        <!-- Upload PDF Protocole -->
+                        <div class="mb-3">
+                            <label class="form-label">Fichier PDF du Protocole *</label>
+                            <input type="file" class="form-control" id="protocolPdf" accept=".pdf" required>
+                            <div class="form-text">Format PDF uniquement. Taille max: 20MB.</div>
+                        </div>
+
+                        <!-- Sélection de la Norme -->
+                        <div class="mb-3">
+                            <label class="form-label">Norme de Référence *</label>
+                            <select class="form-select" id="normeSelect" required>
+                                <option value="" disabled selected>Chargement des normes disponibles...</option>
+                            </select>
+                            <div class="form-text">Sélectionnez la norme ISO, FDA ou interne à utiliser pour la vérification.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-institutional w-100" id="btnAudit">
+                            <i class="bi bi-search"></i> Lancer l'Audit de Conformité
+                        </button>
+                    </form>
+
+                    <!-- Workflow -->
+                    <div id="workflowSection" class="mt-4" style="display:none;">
+                        <h6 class="mb-3"><i class="bi bi-diagram-3"></i> Processus d'Audit en Cours</h6>
+                        <div class="workflow-step" id="step1">
+                            <div class="step-number">1</div>
+                            <div><strong>Extraction & Indexation</strong><br><small>Lecture du PDF protocole</small></div>
+                        </div>
+                        <div class="workflow-step" id="step2">
+                            <div class="step-number">2</div>
+                            <div><strong>Récupération normative</strong><br><small>Filtrage RAG sur la norme sélectionnée</small></div>
+                        </div>
+                        <div class="workflow-step" id="step3">
+                            <div class="step-number">3</div>
+                            <div><strong>Analyse de conformité</strong><br><small>Vérification point par point par l'agent IA</small></div>
+                        </div>
+                        <div class="workflow-step" id="step4">
+                            <div class="step-number">4</div>
+                            <div><strong>Génération du rapport</strong><br><small>Production du verdict & actions correctives</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Résultats (inchangé) -->
+            <div class="col-lg-5">
+                <div id="resultSection" class="result-box">
+                    <h5 class="mb-4"><i class="bi bi-file-earmark-check"></i> Résultat de l'Audit</h5>
+                    
+                    <div class="text-center mb-4 p-4 rounded" style="background: var(--light-bg);">
+                        <div id="riskScore" class="display-4 fw-bold text-primary">0</div>
+                        <div class="text-muted">Score de Risque / 10</div>
+                        <div id="conformityStatus" class="mt-3 fw-bold"></div>
+                    </div>
+
+                    <div id="violationsSection" class="mb-4">
+                        <h6><i class="bi bi-exclamation-triangle text-danger"></i> Non-Conformités Détectées</h6>
+                        <ul id="violationsList" class="list-group"></ul>
+                    </div>
+
+                    <div id="actionsSection">
+                        <h6><i class="bi bi-lightbulb text-warning"></i> Actions Correctives Recommandées</h6>
+                        <ul id="actionsList" class="list-group"></ul>
+                    </div>
+
+                    <div class="mt-4 d-grid gap-2">
+                        <button class="btn btn-primary"><i class="bi bi-download"></i> Télécharger le Rapport PDF</button>
+                        <button class="btn btn-outline-secondary"><i class="bi bi-envelope"></i> Envoyer aux Responsables</button>
+                    </div>
+                </div>
+
+                <!-- Placeholder initial -->
+                <div id="placeholderSection" class="text-center text-muted p-5">
+                    <i class="bi bi-clipboard-check display-1"></i>
+                    <p class="mt-3">Uploadez un protocole PDF et choisissez une norme pour lancer l'audit</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Normes Section -->
+    <section id="normes" class="content-section">
+        <div class="container">
+            <h3 class="section-title">Référentiels Normatifs</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="bi bi-book-half text-primary"></i> ISO 22716:2007</h5>
+                        <p>Bonnes Pratiques de Fabrication (BPF) pour les produits cosmétiques. Norme internationale de référence.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> Contrôle qualité</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Production et stockage</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Documentation et traçabilité</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="bi bi-file-text text-primary"></i> Circulaire 104-DMP</h5>
+                        <p>Réglementation marocaine relative aux produits cosmétiques et d'hygiène corporelle.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> Enregistrement des produits</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Exigences de sécurité</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Étiquetage obligatoire</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="institutional-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>À Propos</h5>
+                    <p>Plateforme nationale d'intelligence artificielle pour l'accompagnement des industriels du secteur cosmétique vers la conformité réglementaire.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Ministère de l'Industrie</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">IMANOR</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">ISO.org</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Contact</h5>
+                    <p><i class="bi bi-geo-alt"></i> Direction de la Qualité, Rabat<br>
+                    <i class="bi bi-envelope"></i> contact@conformite-cosmetique.ma<br>
+                    <i class="bi bi-telephone"></i> +212 5XX-XXXXXX</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Plateforme Nationale de Conformité Cosmétique - ENSET Challenge 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // === CHARGEMENT DYNAMIQUE DES NORMES (pour l'audit) ===
+    async function loadNormesForAudit() {
+        const select = document.getElementById('normeSelect');
+        if (!select) return; // Sécurité si l'élément n'existe pas
+        
+        try {
+            const res = await fetch('/api/list-normes');
+            if (!res.ok) throw new Error('Erreur chargement API');
+            const data = await res.json();
+            
+            select.innerHTML = '<option value="" disabled selected>── Sélectionnez une norme ──</option>';
+            
+            if (data.normes && data.normes.length > 0) {
+                data.normes.forEach(norme => {
+                    const opt = document.createElement('option');
+                    opt.value = norme.name;
+                    const catLabel = {
+                        'international': '🌍',
+                        'national': '🇲🇦',
+                        'guide': '📖',
+                        'interne': '🔒'
+                    }[norme.category] || '📄';
+                    opt.textContent = `${catLabel} ${norme.name} (${norme.category || 'Interne'})`;
+                    select.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.textContent = "Aucune norme disponible";
+                opt.disabled = true;
+                select.appendChild(opt);
+            }
+        } catch (err) {
+            console.error('Erreur chargement normes:', err);
+            select.innerHTML = '<option value="" disabled>⚠️ Erreur de chargement</option>';
+        }
+    }
+
+    // === GESTION DU FORMULAIRE D'AUDIT (PDF + Norme) ===
+    const auditForm = document.getElementById('auditForm');
+    if (auditForm) {
+        auditForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const pdfFile = document.getElementById('protocolPdf')?.files?.[0];
+            const selectedNorme = document.getElementById('normeSelect')?.value;
+            const btn = document.getElementById('btnAudit');
+            
+            if (!pdfFile) {
+                alert('📄 Veuillez sélectionner un fichier PDF de protocole');
+                return;
+            }
+            if (!selectedNorme) {
+                alert('📚 Veuillez sélectionner une norme de référence');
+                return;
+            }
+
+            // UI: Afficher workflow + désactiver bouton
+            document.getElementById('workflowSection').style.display = 'block';
+            document.getElementById('placeholderSection').style.display = 'none';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Analyse en cours...';
+            }
+            
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            steps.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.className = 'workflow-step';
+            });
+
+            try {
+                // Animation des étapes
+                for (let i = 0; i < steps.length; i++) {
+                    const stepEl = document.getElementById(steps[i]);
+                    if (stepEl) {
+                        stepEl.classList.add('active');
+                        if (i > 0) {
+                            const prevEl = document.getElementById(steps[i-1]);
+                            if (prevEl) prevEl.classList.add('completed');
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 600));
+                }
+
+                // Préparation FormData (fichier + norme)
+                const formData = new FormData();
+                formData.append('protocol_pdf', pdfFile);
+                formData.append('norme_reference', selectedNorme);
+
+                // Appel API (NE PAS mettre Content-Type avec FormData)
+                const response = await fetch('/api/audit-fabrication', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `Erreur serveur (${response.status})`);
+                }
+                
+                const data = await response.json();
+                const result = data.compliance_result || data;
+
+                // Fin workflow
+                steps.forEach(s => {
+                    const el = document.getElementById(s);
+                    if (el) el.classList.remove('active');
+                });
+                const lastStep = document.getElementById('step4');
+                if (lastStep) lastStep.classList.add('completed');
+                
+                const resultSection = document.getElementById('resultSection');
+                if (resultSection) resultSection.classList.add('show');
+
+                // Affichage résultats
+                const score = result.score_risque ?? 0;
+                const scoreEl = document.getElementById('riskScore');
+                if (scoreEl) {
+                    scoreEl.textContent = score;
+                    scoreEl.className = 'display-4 fw-bold ' + 
+                        (score < 3 ? 'text-success' : score < 7 ? 'text-warning' : 'text-danger');
+                }
+                
+                const statusEl = document.getElementById('conformityStatus');
+                if (statusEl) {
+                    if (result.conformite_globale === 'CONFORME') {
+                        statusEl.innerHTML = '<span class="badge bg-success fs-6">✅ Protocole Conforme</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="badge bg-danger fs-6">❌ Non Conforme</span>';
+                    }
+                }
+
+                // Violations
+                const vList = document.getElementById('violationsList');
+                if (vList) {
+                    if (result.violations?.length > 0) {
+                        vList.innerHTML = result.violations.map(v => 
+                            `<li class="list-group-item list-group-item-danger">
+                                <strong>${v.etape || 'Général'}:</strong> ${v.ecart}
+                                <br><small class="text-muted"><i class="bi bi-book"></i> ${v.reference_iso || selectedNorme}</small>
+                            </li>`
+                        ).join('');
+                    } else {
+                        vList.innerHTML = '<li class="list-group-item list-group-item-success">✅ Aucune violation détectée</li>';
+                    }
+                }
+
+                // Actions correctives
+                const aList = document.getElementById('actionsList');
+                if (aList) {
+                    if (result.actions_correctives?.length > 0) {
+                        aList.innerHTML = result.actions_correctives.map(a => 
+                            `<li class="list-group-item"><i class="bi bi-check2-circle text-success me-2"></i>${a}</li>`
+                        ).join('');
+                    } else {
+                        aList.innerHTML = '<li class="list-group-item text-muted">Aucune action corrective requise</li>';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Erreur audit:', error);
+                alert('❌ Erreur lors de l\'analyse: ' + error.message);
+                steps.forEach(s => {
+                    const el = document.getElementById(s);
+                    if (el) el.classList.remove('active', 'completed');
+                });
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-search"></i> Lancer l\'Audit de Conformité';
+                }
+            }
+        });
+    }
+
+    // === GESTION UPLOAD NORMES (Admin) ===
+    const uploadForm = document.getElementById('uploadNormeForm');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const pdfFile = document.getElementById('pdfFile')?.files?.[0];
+            if (!pdfFile) {
+                alert('Veuillez sélectionner un fichier PDF');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('norme_name', document.getElementById('normeName')?.value || 'Norme Personnalisée');
+            formData.append('description', document.getElementById('normeDesc')?.value || '');
+            formData.append('category', document.getElementById('normeCategory')?.value || 'interne');
+            formData.append('pdf_file', pdfFile);
+            
+            const statusDiv = document.getElementById('uploadStatus');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // UI: État de chargement
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Indexation...';
+            }
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'alert alert-info';
+                statusDiv.innerHTML = '<i class="bi bi-hourglass-split"></i> Lecture PDF et création des embeddings...';
+            }
+            
+            try {
+                const response = await fetch('/api/upload-norme', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    if (statusDiv) {
+                        statusDiv.className = 'alert alert-success';
+                        statusDiv.innerHTML = `<i class="bi bi-check-circle"></i> ✅ Norme "${result.norme_name}" indexée !<br>
+                                            <small>${result.chunks_added} chunks créés.</small>`;
+                    }
+                    
+                    // Reset formulaire
+                    this.reset();
+                    
+                    // Rafraîchir les listes
+                    await refreshNormesList();
+                    await loadNormesForAudit();
+                    
+                } else {
+                    throw new Error(result.error || 'Erreur lors de l\'upload');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                if (statusDiv) {
+                    statusDiv.className = 'alert alert-danger';
+                    statusDiv.innerHTML = `<i class="bi bi-x-circle"></i> ❌ Erreur: ${error.message}`;
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-upload"></i> Indexer la Norme';
+                }
+                // Masquer message après 5s
+                if (statusDiv) {
+                    setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+                }
+            }
+        });
+    }
+
+    // === RAFRAÎCHIR LISTE NORMES (Admin) ===
+    async function refreshNormesList() {
+        const container = document.getElementById('normesListContainer');
+        if (!container) return;
+        
+        container.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-hourglass-split"></i><br>Chargement...</div>';
+        
+        try {
+            const response = await fetch('/api/list-normes');
+            const data = await response.json();
+            
+            if (data.normes?.length > 0) {
+                let html = '<ul class="list-group list-group-flush">';
+                
+                data.normes.forEach(norme => {
+                    const badgeClass = {
+                        'international': 'bg-primary',
+                        'national': 'bg-success', 
+                        'guide': 'bg-info text-dark',
+                        'interne': 'bg-secondary'
+                    }[norme.category] || 'bg-secondary';
+                    
+                    const icon = {
+                        'international': '🌍',
+                        'national': '🇲🇦',
+                        'guide': '📖',
+                        'interne': '🔒'
+                    }[norme.category] || '📄';
+                    
+                    html += `
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="me-2">
+                                <strong>${icon} ${norme.name}</strong>
+                                <br><small class="text-muted">${norme.filename || 'N/A'} • ${norme.upload_date || 'N/A'}</small>
+                                ${norme.description ? `<br><small class="text-muted fst-italic">${norme.description}</small>` : ''}
+                            </div>
+                            <span class="badge ${badgeClass} rounded-pill">${norme.category || 'interne'}</span>
+                        </li>
+                    `;
+                });
+                
+                html += '</ul>';
+                container.innerHTML = html;
+                
+                // Stats
+                const totalEl = document.getElementById('totalNormes');
+                const chunksEl = document.getElementById('totalChunks');
+                if (totalEl) totalEl.textContent = data.normes.length;
+                if (chunksEl) chunksEl.textContent = data.total_chunks || 0;
+                
+            } else {
+                container.innerHTML = '<div class="text-center text-muted py-4">📭 Aucune norme indexée pour le moment.</div>';
+            }
+            
+        } catch (error) {
+            console.error('Erreur chargement liste:', error);
+            container.innerHTML = `<div class="alert alert-danger m-3">⚠️ Erreur: ${error.message}</div>`;
+        }
+    }
+
+    // === SMOOTH SCROLL POUR ANCHRES ===
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Fermer menu mobile si ouvert
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar && window.innerWidth < 768) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    });
+
+    // === INITIALISATION AU CHARGEMENT ===
+    document.addEventListener('DOMContentLoaded', () => {
+        // Charger les normes pour l'audit ET l'admin
+        loadNormesForAudit();
+        refreshNormesList();
+        
+        // Animation d'entrée douce
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => { document.body.style.opacity = '1'; }, 100);
+    });
+</script>
+</body>
+</html>

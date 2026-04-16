@@ -1,0 +1,131 @@
+/* Styles personnalisés pour l'interface */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Workflow steps */
+.workflow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.step {
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    opacity: 0.5;
+}
+
+.step.active {
+    background: #0d6efd;
+    color: white;
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+.step.completed {
+    background: #198754;
+    color: white;
+    opacity: 1;
+}
+
+.step i {
+    font-size: 1.2rem;
+}
+
+/* Score de risque circulaire */
+.risk-score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-weight: bold;
+    border: 5px solid;
+    transition: all 0.3s ease;
+}
+
+.risk-score-circle.low {
+    background: #d1e7dd;
+    border-color: #198754;
+    color: #0f5132;
+}
+
+.risk-score-circle.medium {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #664d03;
+}
+
+.risk-score-circle.high {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #842029;
+}
+
+.risk-score-circle span {
+    font-size: 2rem;
+}
+
+.risk-score-circle small {
+    font-size: 0.9rem;
+}
+
+/* Header dynamique */
+#resultHeader.conforme {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+#resultHeader.non-conforme {
+    background: #f8d7da;
+    color: #842029;
+}
+
+#resultHeader.warning {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .risk-score-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .risk-score-circle span {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.step.processing {
+    animation: pulse 1.5s infinite;
+}
+
+/* Liste des violations */
+.list-group-item.violation-item {
+    border-left: 4px solid #dc3545;
+}
+
+.list-group-item.action-item {
+    border-left: 4px solid #198754;
+}
