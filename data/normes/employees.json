@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "Karim Tazi",
+    "email": "karim.tazi@entreprise.ma",
+    "role": "Responsable Qualité",
+    "department": "Qualité & Conformité",
+    "skills": ["ISO 22716", "ISO 22000", "HACCP", "audit interne", "validation procédés", "challenge test"],
+    "certifications": ["Auditeur ISO 22716", "HACCP Niveau 3", "BPF Cosmétiques"],
+    "experience_years": 7,
+    "availability": "Disponible",
+    "photo": "https://i.pravatar.cc/150?img=11",
+    "phone": "+212 6XX-XXXXXX",
+    "languages": ["Français", "Arabe", "Anglais"]
+  },
+  {
+    "id": 2,
+    "name": "Fatima Zahra",
+    "email": "fatima.zahra@entreprise.ma",
+    "role": "Chef de Production",
+    "department": "Production",
+    "skills": ["Pasteurisation", "contrôle procédés", "nettoyage CIP", "gestion ligne", "Hot Fill", "émulsification"],
+    "certifications": ["BPF Agroalimentaire", "Sécurité sanitaire", "Lean Manufacturing"],
+    "experience_years": 5,
+    "availability": "Disponible",
+    "photo": "https://i.pravatar.cc/150?img=5",
+    "phone": "+212 6XX-XXXXXX",
+    "languages": ["Français", "Arabe"]
+  },
+  {
+    "id": 3,
+    "name": "Youssef El Amrani",
+    "email": "youssef.amrani@entreprise.ma",
+    "role": "Technicien QC",
+    "department": "Contrôle Qualité",
+    "skills": ["analyses microbiologiques", "pH-métrie", "viscosimétrie", "échantillonnage", "challenge test"],
+    "certifications": ["Contrôle Qualité Agro", "Bonnes Pratiques de Laboratoire"],
+    "experience_years": 3,
+    "availability": "En congé",
+    "photo": "https://i.pravatar.cc/150?img=3",
+    "phone": "+212 6XX-XXXXXX",
+    "languages": ["Français", "Arabe"]
+  },
+  {
+    "id": 4,
+    "name": "Amina Benali",
+    "email": "amina.benali@entreprise.ma",
+    "role": "Responsable R&D",
+    "department": "Recherche & Développement",
+    "skills": ["formulation cosmétique", "stabilité produit", "tests consommateurs", "réglementation UE 1223/2009"],
+    "certifications": ["Chimiste Cosmétique", "Réglementation Cosmétique"],
+    "experience_years": 6,
+    "availability": "Disponible",
+    "photo": "https://i.pravatar.cc/150?img=9",
+    "phone": "+212 6XX-XXXXXX",
+    "languages": ["Français", "Arabe", "Anglais", "Espagnol"]
+  },
+  {
+    "id": 5,
+    "name": "Mohamed Alaoui",
+    "email": "mohamed.alaoui@entreprise.ma",
+    "role": "Responsable Logistique",
+    "department": "Supply Chain",
+    "skills": ["traçabilité lot", "gestion stock", "conditionnement", "expédition", "GMP stockage"],
+    "certifications": ["Logistique Pharmaceutique", "Gestion des Stocks"],
+    "experience_years": 4,
+    "availability": "Disponible",
+    "photo": "https://i.pravatar.cc/150?img=12",
+    "phone": "+212 6XX-XXXXXX",
+    "languages": ["Français", "Arabe"]
+  }
+]

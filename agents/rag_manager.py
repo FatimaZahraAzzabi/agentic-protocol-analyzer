@@ -176,12 +176,16 @@ class DynamicRAGManager:
         normes_map = {}
         for doc in all_docs:
             meta = doc.metadata
-            name = meta.get("norme_name", "Inconnue")
-            
+            name = meta.get("norme_name")
+
             # Skip le document placeholder d'initialisation
             if meta.get("init"):
                 continue
-                
+
+            # Ignorer les documents sans nom de norme valide
+            if not name or not str(name).strip():
+                continue
+
             if name not in normes_map:
                 normes_map[name] = {
                     "name": name,
@@ -250,3 +254,54 @@ class DynamicRAGManager:
             "total_normes": len(self.get_indexed_normes()),
             "categories": categories
         }
+    
+    import json
+
+def index_employees(self, employees_json_path: str = "data/employees.json"):
+    """Indexe les profils employés dans FAISS"""
+    with open(employees_json_path, 'r', encoding='utf-8') as f:
+        employees = json.load(f)
+        
+    docs = []
+    for emp in employees:
+        # On crée un "document texte" riche pour le matching sémantique
+        text = (
+            f"{emp['name']} - {emp['role']} | "
+            f"Compétences: {', '.join(emp['skills'])} | "
+            f"Certifications: {', '.join(emp['certifications'])} | "
+            f"Expérience: {emp['experience']} ans | "
+            f"Disponibilité: {emp['availability']}"
+        )
+        # On attache TOUTES les métadonnées pour les retourner plus tard
+        docs.append(Document(page_content=text, metadata={"type": "employee", **emp}))
+        
+    self.db.add_documents(docs)
+    self.db.save_local(str(self.db_path))
+    print(f"✅ {len(docs)} profils employés indexés dans FAISS")
+
+def search_employees(self, requirements: str, k: int = 3) -> list:
+    """Retourne les employés les plus匹配 aux exigences du protocole"""
+    # FAISS retourne (Document, distance). Distance faible = forte similarité
+    results = self.db.similarity_search_with_score(
+        requirements, 
+        k=k, 
+        filter={"type": "employee"}
+    )
+    
+    suggestions = []
+    for doc, distance in results:
+        meta = doc.metadata
+        # Conversion distance → score % (plus la distance est faible, plus le score est haut)
+        match_score = round(max(0, (1 - distance) * 100), 1)
+        
+        suggestions.append({
+            "name": meta["name"],
+            "role": meta["role"],
+            "match_score": match_score,
+            "skills": meta["skills"][:3],  # Top 3 compétences
+            "certifications": meta["certifications"],
+            "experience": meta["experience"],
+            "availability": meta["availability"],
+            "photo": meta.get("photo", "https://i.pravatar.cc/150?img=12")
+        })
+    return suggestions

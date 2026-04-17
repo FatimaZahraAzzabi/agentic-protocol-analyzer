@@ -41,7 +41,7 @@ def generate_report(state: AuditState) -> dict:
 
 def route_after_audit(state: AuditState) -> str:
     score = state["compliance_result"].get("score_risque", 0)
-    if score >= 6:
+    if score >= 3:
         return "human_review"
     return "report"
 

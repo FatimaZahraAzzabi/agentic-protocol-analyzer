@@ -340,3 +340,146 @@ Finalisation du processus avec traçabilité complète.
 ✅ Recommandation: Former le personnel sur ces procédures et effectuer des audits réguliers.
 """
         return corrected
+
+    def generate_diagnostic_pdf(self, audit_result: dict, protocol_text: str, norme_ref: str) -> BytesIO:
+        """Génère le PDF de diagnostic (erreurs et risques de l'ancien protocole)"""
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, topMargin=2.5*cm, bottomMargin=2*cm)
+        elements = []
+
+        # === EN-TÊTE ===
+        elements.append(Paragraph("RAPPORT DE DIAGNOSTIC", self.styles['CustomTitle']))
+        elements.append(Paragraph("Analyse des Risques et Non-Conformités", self.styles['Normal']))
+        elements.append(Spacer(1, 0.5*cm))
+
+        # === MÉTADONNÉES ===
+        status = audit_result.get('conformite_globale', 'N/A')
+        score = audit_result.get('score_risque', 0)
+
+        meta_data = [
+            ['Date:', datetime.now().strftime('%d/%m/%Y')],
+            ['Norme:', norme_ref or 'ISO 22716:2007'],
+            ['Statut:', status],
+            ['Score Risque:', f"{score}/10"]
+        ]
+        meta_table = Table(meta_data, colWidths=[4*cm, 11*cm])
+        meta_table.setStyle(TableStyle([
+            ('FONTNAME', (0,0), (0,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 10),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.grey), ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f1f5f9')),
+            ('PADDING', (0,0), (-1,-1), 6)
+        ]))
+        elements.append(meta_table)
+        elements.append(Spacer(1, 1*cm))
+
+        # === VIOLATIONS ===
+        elements.append(Paragraph("🚨 VIOLATIONS DÉTECTÉES", self.styles['CustomHeading']))
+        violations = audit_result.get('violations', [])
+
+        if violations:
+            elements.append(Paragraph(f"{len(violations)} non-conformité(s) identifiée(s) :", self.styles['Normal']))
+            elements.append(Spacer(1, 0.3*cm))
+
+            for i, v in enumerate(violations, 1):
+                risk_text = v.get('risque', "Risque de non-conformité réglementaire.")
+                elements.append(Paragraph(f"<b>• Violation {i} ({v.get('etape', 'Général')}):</b>", self.styles['ProtocolText']))
+                elements.append(Paragraph(f"   <b>Écart:</b> {v.get('ecart', 'Non spécifié')}", self.styles['ProtocolText']))
+                elements.append(Paragraph(f"   <b>Risque:</b> {risk_text}", self.styles['AdviceBox']))
+                elements.append(Paragraph(f"   <b>Référence:</b> {v.get('reference_iso', norme_ref)}", self.styles['ProtocolText']))
+                elements.append(Spacer(1, 0.3*cm))
+        else:
+            elements.append(Paragraph("✅ Aucune violation détectée - Protocole conforme", self.styles['SuccessText']))
+
+        # === ACTIONS CORRECTIVES ===
+        elements.append(PageBreak())
+        elements.append(Paragraph("🔧 ACTIONS CORRECTIVES RECOMMANDÉES", self.styles['CustomHeading']))
+        actions = audit_result.get('actions_correctives', [])
+
+        if actions:
+            for i, action in enumerate(actions, 1):
+                elements.append(Paragraph(f"<b>{i}.</b> {action}", self.styles['ProtocolText']))
+                elements.append(Spacer(1, 0.2*cm))
+        else:
+            elements.append(Paragraph("Aucune action corrective nécessaire", self.styles['Normal']))
+
+        # === ALTERNATIVES BIO ===
+        bio_alternatives = audit_result.get('bio_alternatives', [])
+        if bio_alternatives:
+            elements.append(Spacer(1, 0.5*cm))
+            elements.append(Paragraph("🌿 ALTERNATIVES BIO/NATURELLES", self.styles['CustomHeading']))
+            for i, alt in enumerate(bio_alternatives, 1):
+                elements.append(Paragraph(f"<b>{i}.</b> {alt}", self.styles['ProtocolText']))
+                elements.append(Spacer(1, 0.2*cm))
+
+        doc.build(elements)
+        buffer.seek(0)
+        return buffer
+
+    def generate_corrected_protocol_pdf(self, corrected_protocol: str, norme_ref: str) -> BytesIO:
+        """Génère le PDF du protocole corrigé"""
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, topMargin=2.5*cm, bottomMargin=2*cm)
+        elements = []
+
+        # === EN-TÊTE ===
+        elements.append(Paragraph("PROTOCOLE DE FABRICATION CORRIGÉ", self.styles['CustomTitle']))
+        elements.append(Paragraph(f"Conforme à {norme_ref}", self.styles['Normal']))
+        elements.append(Spacer(1, 0.5*cm))
+
+        # === MÉTADONNÉES ===
+        meta_data = [
+            ['Date:', datetime.now().strftime('%d/%m/%Y')],
+            ['Norme:', norme_ref],
+            ['Version:', 'Corrigée'],
+            ['Statut:', 'Validé pour production']
+        ]
+        meta_table = Table(meta_data, colWidths=[4*cm, 11*cm])
+        meta_table.setStyle(TableStyle([
+            ('FONTNAME', (0,0), (0,-1), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,-1), 10),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.grey), ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f1f5f9')),
+            ('PADDING', (0,0), (-1,-1), 6)
+        ]))
+        elements.append(meta_table)
+        elements.append(Spacer(1, 1*cm))
+
+        # === PROTOCOLE CORRIGÉ ===
+        elements.append(Paragraph("📋 PROCÉDURE DE FABRICATION", self.styles['CustomHeading']))
+
+        # Formater le protocole avec des paragraphes
+        protocol_lines = corrected_protocol.split('\n')
+        current_paragraph = []
+
+        for line in protocol_lines:
+            line = line.strip()
+            if not line:
+                if current_paragraph:
+                    elements.append(Paragraph(' '.join(current_paragraph), self.styles['ProtocolText']))
+                    current_paragraph = []
+                elements.append(Spacer(1, 0.2*cm))
+            elif line.startswith(('1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.')):
+                if current_paragraph:
+                    elements.append(Paragraph(' '.join(current_paragraph), self.styles['ProtocolText']))
+                    current_paragraph = []
+                elements.append(Spacer(1, 0.3*cm))
+                elements.append(Paragraph(f"<b>{line}</b>", self.styles['ProtocolText']))
+            elif line.startswith(('- ', '• ', '* ')):
+                if current_paragraph:
+                    elements.append(Paragraph(' '.join(current_paragraph), self.styles['ProtocolText']))
+                    current_paragraph = []
+                elements.append(Paragraph(f"  {line}", self.styles['ProtocolText']))
+            else:
+                current_paragraph.append(line)
+
+        if current_paragraph:
+            elements.append(Paragraph(' '.join(current_paragraph), self.styles['ProtocolText']))
+
+        # === PIED DE PAGE ===
+        elements.append(Spacer(1, 2*cm))
+        elements.append(Paragraph(
+            "<i>Protocole corrigé généré automatiquement - À valider par le Responsable Qualité</i><br/>"
+            "Confidentiel — Usage professionnel",
+            self.styles['Normal']
+        ))
+
+        doc.build(elements)
+        buffer.seek(0)
+        return buffer

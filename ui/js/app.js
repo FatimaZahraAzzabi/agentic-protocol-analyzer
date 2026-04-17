@@ -105,7 +105,7 @@ function displayResults(result) {
     const scoreCircle = document.getElementById('riskScore');
     document.getElementById('scoreValue').textContent = score;
     scoreCircle.className = 'risk-score-circle ' + 
-        (score < 3 ? 'low' : score < 7 ? 'medium' : 'high');
+        (score <= 2 ? 'low' : score <= 6 ? 'medium' : 'high');
     
     // Label conformité
     const label = document.getElementById('conformiteLabel');
